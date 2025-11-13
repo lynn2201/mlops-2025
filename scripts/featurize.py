@@ -1,27 +1,29 @@
 import argparse
 import pandas as pd
 
+from mlops_2025.features.features_computer import SimpleFeaturesComputer
 
-def featurize(input_path: str, output_path: str) -> None:
-    print(f"Reading processed data from: {input_path}")
-    df = pd.read_csv(input_path)
 
-    # Example feature: FamilySize (if these columns exist)
-    if {"SibSp", "Parch"}.issubset(df.columns):
-        df["FamilySize"] = df["SibSp"] + df["Parch"] + 1
-
-    print(f"Writing features to: {output_path}")
-    df.to_csv(output_path, index=False)
-    print("Done.")
+def build_parser():
+    p = argparse.ArgumentParser(description="Compute features for Titanic dataset")
+    p.add_argument("--input", required=True, help="Processed input CSV")
+    p.add_argument("--output", required=True, help="Output features CSV")
+    return p
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Create features for Titanic data")
-    parser.add_argument("--input", required=True, help="Path to processed CSV")
-    parser.add_argument("--output", required=True, help="Path to features CSV")
-    args = parser.parse_args()
+    args = build_parser().parse_args()
 
-    featurize(args.input, args.output)
+    print("Loading processed data...")
+    df = pd.read_csv(args.input)
+
+    print("Computing features...")
+    fe = SimpleFeaturesComputer()
+    df_features = fe.compute_features(df)
+
+    print(f"Saving features to {args.output}")
+    df_features.to_csv(args.output, index=False)
+    print("Done.")
 
 
 if __name__ == "__main__":
