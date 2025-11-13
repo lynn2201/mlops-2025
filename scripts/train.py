@@ -1,36 +1,49 @@
 import argparse
-from pathlib import Path
-
-import joblib
+import pickle
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
+
+from mlops_2025.model.model import SimpleRandomForestModel
 
 
-def train(input_path: str, model_path: str) -> None:
-    print(f"Reading features from: {input_path}")
-    df = pd.read_csv(input_path)
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        description="Train a Random Forest model on Titanic features"
+    )
+    parser.add_argument(
+        "--input",
+        required=True,
+        help="Path to features CSV (must contain a 'Survived' target column)",
+    )
+    parser.add_argument(
+        "--model",
+        required=True,
+        help="Path where the trained model will be saved (e.g. models/model.pkl)",
+    )
+    return parser
 
-    # Very simple example: adjust column names to your CSV
-    X = df[["Pclass", "Age"]]  # change if your columns differ
+
+def main() -> None:
+    args = build_parser().parse_args()
+
+    print("Loading feature data...")
+    df = pd.read_csv(args.input)
+
+    # Split into X (features) and y (target)
+    if "Survived" not in df.columns:
+        raise ValueError("Expected a 'Survived' column in the input features CSV.")
+
     y = df["Survived"]
+    X = df.drop(columns=["Survived"])
 
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X, y)
+    print("Training Random Forest model...")
+    model = SimpleRandomForestModel()
+    model.train(X, y)
 
-    model_path = Path(model_path)
-    model_path.parent.mkdir(parents=True, exist_ok=True)
+    print(f"Saving trained model to {args.model} ...")
+    with open(args.model, "wb") as f:
+        pickle.dump(model, f)
 
-    joblib.dump(model, model_path)
-    print(f"Model saved to {model_path}")
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Train a simple Titanic model")
-    parser.add_argument("--input", required=True, help="Path to features CSV")
-    parser.add_argument("--model", required=True, help="Path to output model .pkl")
-    args = parser.parse_args()
-
-    train(args.input, args.model)
+    print("Done.")
 
 
 if __name__ == "__main__":
