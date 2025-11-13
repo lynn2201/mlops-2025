@@ -1,0 +1,21 @@
+1. Why do we use a BasePreprocessor class?
+To define a common structure for preprocessors and ensure each one has a process() method.
+
+2. Why move preprocessing code into a class?
+To avoid repeating code, make the logic reusable, and allow switching preprocessors easily.
+
+3. Why do we create a BaseFeaturesComputer class?
+To standardize feature engineering and ensure all feature classes follow the same interface.
+
+4. Why move feature engineering into a class?
+To keep code modular, easier to understand, and allow different feature strategies.
+
+5. Why use a BaseModel class?
+To unify the train() and predict() interface so we can swap models without changing scripts.
+
+6. What improvements could still be made to the package?
+Add tests, logging, error handling, configs, and better documentation.
+
+7. What differences did you observe between models?
+Logistic Regression is simple but may underfit. RandomForest handles non-linear patterns better. XGBoost performs best but needs tuning.
+
