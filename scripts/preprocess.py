@@ -1,26 +1,29 @@
 import argparse
 import pandas as pd
 
+from mlops_2025.preprocessing.preprocessor import SimplePreprocessor
 
-def preprocess(input_path: str, output_path: str) -> None:
-    print(f"Reading raw data from: {input_path}")
-    df = pd.read_csv(input_path)
 
-    # Minimal cleaning (you can customize later)
-    df = df.dropna()
-
-    print(f"Writing processed data to: {output_path}")
-    df.to_csv(output_path, index=False)
-    print("Done.")
+def build_parser():
+    p = argparse.ArgumentParser(description="Preprocess raw Titanic data")
+    p.add_argument("--input", required=True, help="Path to input raw CSV")
+    p.add_argument("--output", required=True, help="Path to output processed CSV")
+    return p
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Preprocess Titanic data")
-    parser.add_argument("--input", required=True, help="Path to raw input CSV")
-    parser.add_argument("--output", required=True, help="Path to processed output CSV")
-    args = parser.parse_args()
+    args = build_parser().parse_args()
 
-    preprocess(args.input, args.output)
+    print("Loading raw data...")
+    df = pd.read_csv(args.input)
+
+    print("Applying preprocessing...")
+    pre = SimplePreprocessor()
+    df_processed = pre.process(df)
+
+    print(f"Saving processed data to {args.output}")
+    df_processed.to_csv(args.output, index=False)
+    print("Done.")
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 [project]
-name = "mlops-2025"
+name = "mlops_2025"
 version = "0.1.0"
-description = "Add your description here"
+description = "MLOps Lab package"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -16,3 +16,12 @@ dependencies = [
 dev = [
     "jupyter>=1.1.1",
 ]
+
+[tool.uv]
+package = true
+
+[tool.uv.sources]
+mlops_2025 = { path = "src/mlops_2025" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
